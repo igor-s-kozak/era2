@@ -447,3 +447,204 @@ body:not(.dark) {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+
+
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@layer base {
+  :root {
+    /* ERA2 Raw Palette */
+    --era-bg: #0e0b0a;
+    --era-bg-1: #141110;
+    --era-bg-2: #1a1614;
+    --era-bg-3: #221c19;
+    --era-line: #2a221e;
+    --era-fg: #f6efe9;
+    --era-fg-dim: #c8beb6;
+    --era-fg-mute: #8a7f78;
+    --era-fg-low: #5a504a;
+    --era-accent: #e85420;
+    --era-accent-2: #ff7a3d;
+    --era-accent-soft: #3a1a0a;
+    --era-accent-hi: #ffb27a;
+
+    /* Semantic tokens */
+    --background: var(--era-bg);
+    --foreground: var(--era-fg);
+    --card: var(--era-bg-1);
+    --card-foreground: var(--era-fg);
+    --border: var(--era-line);
+    --input: #2d2420;
+    --ring: var(--era-accent);
+    --primary: var(--era-accent);
+    --primary-foreground: #ffffff;
+    --secondary: #1a1514;
+    --secondary-foreground: var(--era-fg);
+    --muted: var(--era-bg-2);
+    --muted-foreground: var(--era-fg-mute);
+    --accent: #39180a;
+    --accent-foreground: #ff743d;
+    --destructive: #ff5f57;
+    --destructive-foreground: #ffffff;
+
+    /* shadcn compatibility */
+    --radius: 0.875rem;
+
+    /* Figma variable names (for Figma-generated code) */
+    --core\/background: #0e0c0c;
+    --core\/foreground: #f7eee8;
+    --card\/card: #141110;
+    --card\/card-foreground: #f7eee8;
+    --primary\/primary: #e95220;
+    --primary\/primary-foreground: #ffffff;
+    --secondary\/secondary: #1a1514;
+    --secondary\/secondary-foreground: #f7eee8;
+    --muted\/muted-foreground: #8c7f78;
+    --accent\/accent: #39180a;
+    --accent\/accent-foreground: #ff743d;
+    --destructive\/destructive: #ff5f57;
+    --form\/border: #2d2420;
+    --form\/input: #2d2420;
+    --era\/bg: #0e0b0a;
+    --era\/bg-1: #141110;
+    --era\/bg-2: #1a1614;
+    --era\/bg-3: #221c19;
+    --era\/line: #2a221e;
+    --era\/fg: #f6efe9;
+    --era\/fg-dim: #c8beb6;
+    --era\/fg-mute: #8a7f78;
+    --era\/fg-low: #5a504a;
+    --era\/accent: #e85420;
+    --era\/accent-2: #ff7a3d;
+    --era\/accent-soft: #3a1a0a;
+    --era\/accent-hi: #ffb27a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--era-bg);
+    color: var(--era-fg);
+    font-family: "Geist Variable", "Inter", sans-serif;
+    margin: 0;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--era-bg-3);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--era-line);
+  }
+}
+
+@layer utilities {
+  .font-geist {
+    font-family: "Geist Variable", "Inter", sans-serif;
+  }
+
+  .font-mono-geist {
+    font-family: "Geist Mono Variable", "Geist Mono", monospace;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Responsive helpers matching Figma breakpoints */
+  @media (min-width: 768px) {
+    .md\:flex {
+      display: flex;
+    }
+    .md\:hidden {
+      display: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .sm\:grid-cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .sm\:px-4 {
+      padding-inline: 1rem;
+    }
+    .sm\:py-6 {
+      padding-block: 1.5rem;
+    }
+    .sm\:text-\[24px\] {
+      font-size: 24px;
+    }
+    .sm\:bottom-0 {
+      bottom: 0;
+    }
+    .sm\:right-0 {
+      right: 0;
+    }
+    .sm\:left-0 {
+      left: 0;
+    }
+    .sm\:w-full {
+      width: 100%;
+    }
+    .sm\:rounded-none {
+      border-radius: 0;
+    }
+    .sm\:rounded-t-2xl {
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+    }
+    .sm\:rounded-b-none {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .sm\:hidden {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .lg\:flex {
+      display: flex;
+    }
+    .lg\:hidden {
+      display: none;
+    }
+    .lg\:px-6 {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse {
+      animation: none;
+    }
+    .transition-colors,
+    .transition-transform,
+    .transition-\[width\] {
+      transition: none;
+    }
+  }
+}
