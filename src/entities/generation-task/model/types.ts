@@ -18,7 +18,8 @@ export interface GenerationTask {
   startedAt?: number;
   finishedAt?: number;
   credits: number;
-  etaSeconds?: number; // estimated seconds remaining
+  etaSeconds?: number; // примерное время до завершения выполнения
   errorMessage?: string;
-  position?: number; // position in queue (for queued tasks)
+  position?: number; // позиция в очереди
+  persistedAt?: number; // временная метка сохранения в localStorage для последующего возобновления прогресса running task
 }
