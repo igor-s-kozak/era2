@@ -1,13 +1,25 @@
 import { useState } from "react";
-import { useLocation } from "@/shared/routing";
+import { useLocation, useNavigate } from "@/shared/routing";
 import { CommandPalette } from "@/features/command-palette";
 import { Header, Sidebar } from "@/widgets/navigation";
 import { CommandPaletteProvider } from "@/features/command-palette";
 import { useAuth } from "@/features/auth";
 import { useTheme } from "@/features/theme-switcher";
 import { cn } from "@/shared/lib/utils";
+import { StatusBar } from "@/features/generation-queue/ui/StatusBar";
+import { useQueue } from "@/features/generation-queue/model/useQueue";
 
-const sidebarPages = ["/text", "/design", "/video", "/audio", "/agents", "/toolkit", "/history", "/pricing", "/create"];
+const sidebarPages = [
+  "/text",
+  "/design",
+  "/video",
+  "/audio",
+  "/agents",
+  "/toolkit",
+  "/history",
+  "/pricing",
+  "/create",
+];
 const workspacePages = ["/text", "/design", "/video", "/audio", "/create"];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -16,13 +28,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthed } = useAuth();
   const { theme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { activeTasks, avgProgress } = useQueue();
 
   // Auth page has no layout at all
   if (location.pathname === "/auth") {
     return <>{children}</>;
   }
 
-  const showSidebar = isAuthed && sidebarPages.some((p) => location.pathname.startsWith(p));
+  const showSidebar =
+    isAuthed && sidebarPages.some((p) => location.pathname.startsWith(p));
   const isFullWidth = !showSidebar;
   const isWorkspace = workspacePages.includes(location.pathname);
 
@@ -70,7 +85,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         >
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <filter id="era-grain">
-              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" />
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.85"
+                numOctaves="4"
+                stitchTiles="stitch"
+              />
               <feColorMatrix type="saturate" values="0" />
               <feComponentTransfer>
                 <feFuncR type="linear" slope="1.2" intercept="0.05" />
@@ -82,6 +102,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </svg>
         </div>
       </div>
+      {location.pathname !== "/queue" && (
+        <StatusBar
+          activeTasks={activeTasks}
+          avgProgress={avgProgress}
+          onNavigateToQueue={() => navigate({ to: "/queue" })}
+        />
+      )}
     </CommandPaletteProvider>
   );
 }
