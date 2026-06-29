@@ -38,7 +38,7 @@ const routes: Record<string, React.ComponentType> = {
   "/tools/audio-generation": AudioGenerationPage,
   "/tools/nano-banana": NanoBananaPage,
   "/tools/agents": AgentsLandingPage,
-  "/generate-queue": QueuePage
+  "/queue": QueuePage
 };
 
 export function AppRoutes() {
