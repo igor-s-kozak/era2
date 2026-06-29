@@ -1,6 +1,6 @@
 export { QueueProvider, useQueueContext } from "./model/QueueProvider";
 export { useQueue } from "./model/useQueue";
-export type { QueueState, QueueAction, LoadingState } from "./model/queueReducer";
+export type { QueueState, QueueAction } from "./model/queueReducer";
 export { selectCounts, selectVisibleTasks, selectActiveTasks, selectAvgProgress } from "./model/selectors";
 
 export { TaskRow } from "./ui/TaskRow";

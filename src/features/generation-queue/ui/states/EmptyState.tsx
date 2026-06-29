@@ -7,24 +7,27 @@ interface EmptyStateProps {
 
 export function EmptyState({ hasFilter, onClearFilter }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-24 gap-4">
-      <div className="w-16 h-16 rounded-2xl bg-[var(--era-bg-3)] flex items-center justify-center text-[var(--era-fg-low)]">
+    <div className="flex flex-col items-center justify-center gap-4 py-24">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
         <Inbox size={28} strokeWidth={1.5} />
       </div>
+
       <div className="text-center">
-        <p className="text-[var(--era-fg-dim)] text-[16px] font-medium font-geist">
+        <p className="text-[16px] font-medium text-foreground">
           {hasFilter ? "Нет задач по фильтру" : "Очередь пуста"}
         </p>
-        <p className="text-[var(--era-fg-mute)] text-[14px] font-geist mt-1">
+
+        <p className="mt-1 text-[14px] text-muted-foreground">
           {hasFilter
             ? "Попробуйте другой фильтр или сбросьте поиск"
             : "Запустите генерацию — задачи появятся здесь"}
         </p>
       </div>
+
       {hasFilter && onClearFilter && (
         <button
           onClick={onClearFilter}
-          className="mt-2 h-9 px-4 rounded-full border border-[var(--era-line)] bg-[var(--era-bg-1)] text-[var(--era-fg-mute)] text-[14px] font-geist hover:text-[var(--era-fg-dim)] transition-colors"
+          className="mt-2 h-9 rounded-full border border-border bg-card px-4 text-[14px] text-muted-foreground transition-colors hover:text-foreground"
         >
           Сбросить фильтр
         </button>

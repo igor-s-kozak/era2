@@ -2,6 +2,7 @@ import type { TaskStatus } from "@/entities/generation-task";
 import { cn } from "@/shared/lib/utils";
 import { ChevronDown, Search } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+
 type FilterValue = TaskStatus | "all";
 type SortValue = "newest" | "oldest";
 
@@ -51,18 +52,17 @@ export function QueueToolbar({
   );
 
   return (
-    <div className={cn("flex items-center gap-3 flex-wrap", className)}>
-      {/* Filter chips — horizontal scroll on mobile */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar flex-shrink-0">
+    <div className={cn("flex flex-wrap items-center gap-3", className)}>
+      <div className="no-scrollbar flex flex-shrink-0 items-center gap-2 overflow-x-auto max-md:w-full">
         {FILTER_CHIPS.map((chip) => (
           <button
             key={chip.value}
             onClick={() => onFilterChange(chip.value)}
             className={cn(
-              "h-[34px] px-[14px] rounded-full text-[14px] font-geist whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--era-accent)]",
+              "h-[34px] whitespace-nowrap rounded-full px-[14px] text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               filter === chip.value
-                ? "bg-[var(--era-accent)] text-white font-medium"
-                : "border border-[var(--era-line)] bg-[var(--era-bg-1)] text-[var(--era-fg-mute)] hover:text-[var(--era-fg-dim)] hover:border-[var(--era-bg-3)]",
+                ? "bg-primary font-medium text-primary-foreground"
+                : "border border-border bg-card text-muted-foreground hover:border-muted hover:text-foreground",
             )}
           >
             {chip.label}
@@ -70,28 +70,26 @@ export function QueueToolbar({
         ))}
       </div>
 
-      <div className="flex-1 min-w-0" />
+      <div className="min-w-0 flex-1" />
 
-      {/* Search */}
-      <div className="relative">
+      <div className="relative max-md:hidden">
         <Search
           size={14}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--era-fg-low)] pointer-events-none"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--c-fg-low)]"
         />
         <input
           type="text"
           defaultValue={search}
           onChange={handleSearch}
           placeholder="Поиск..."
-          className="h-[34px] pl-8 pr-3 rounded-xl border border-[var(--era-line)] bg-[var(--era-bg-1)] text-[var(--era-fg-dim)] text-[14px] font-geist placeholder:text-[var(--era-fg-low)] focus:outline-none focus:border-[var(--era-accent)] transition-colors w-[160px]"
+          className="h-[34px] w-[160px] rounded-xl border border-border bg-card pl-8 pr-3 text-[14px] text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none"
         />
       </div>
 
-      {/* Sort dropdown */}
-      <div className="relative" ref={sortRef}>
+      <div className="relative max-md:hidden" ref={sortRef}>
         <button
           onClick={() => setSortOpen((v) => !v)}
-          className="h-[34px] px-[14px] flex items-center gap-2 rounded-xl border border-[var(--era-line)] bg-[var(--era-bg-1)] text-[var(--era-fg-mute)] text-[14px] font-geist hover:text-[var(--era-fg-dim)] transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--era-accent)]"
+          className="flex h-[34px] items-center gap-2 whitespace-nowrap rounded-xl border border-border bg-card px-[14px] text-[14px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {SORT_OPTIONS.find((o) => o.value === sort)?.label}
           <ChevronDown
@@ -101,7 +99,7 @@ export function QueueToolbar({
         </button>
 
         {sortOpen && (
-          <div className="absolute right-0 top-full mt-1 z-50 min-w-[180px] rounded-xl border border-[var(--era-line)] bg-[var(--era-bg-1)] shadow-lg py-1">
+          <div className="absolute right-0 top-full z-50 mt-1 min-w-[180px] rounded-xl border border-border bg-card py-1 shadow-lg">
             {SORT_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
@@ -110,10 +108,10 @@ export function QueueToolbar({
                   setSortOpen(false);
                 }}
                 className={cn(
-                  "w-full text-left px-3 py-2 text-[14px] font-geist transition-colors hover:bg-[var(--era-bg-3)]",
+                  "w-full px-3 py-2 text-left text-[14px] transition-colors hover:bg-muted",
                   sort === opt.value
-                    ? "text-[var(--era-fg)] font-medium"
-                    : "text-[var(--era-fg-mute)]",
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground",
                 )}
               >
                 {opt.label}

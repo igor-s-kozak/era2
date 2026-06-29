@@ -10,7 +10,7 @@ export function ProgressBar({ progress, className, animated = true }: ProgressBa
   return (
     <div
       className={cn(
-        "h-[5px] w-full rounded-full bg-[var(--era-bg-3)] overflow-hidden",
+        "h-[5px] w-full overflow-hidden rounded-full bg-muted",
         className
       )}
       role="progressbar"
@@ -20,7 +20,7 @@ export function ProgressBar({ progress, className, animated = true }: ProgressBa
     >
       <div
         className={cn(
-          "h-full rounded-full bg-[var(--era-accent)] origin-left",
+          "h-full origin-left rounded-full bg-primary",
           animated && "transition-[width] duration-300 ease-out"
         )}
         style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}

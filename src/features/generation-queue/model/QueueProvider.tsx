@@ -1,3 +1,5 @@
+import type { GenerationTask } from "@/entities/generation-task";
+import { SEED_TASKS } from "@/entities/generation-task";
 import {
   createContext,
   useCallback,
@@ -9,39 +11,19 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { GenerationTask } from "@/entities/generation-task";
-import { SEED_TASKS } from "@/entities/generation-task";
+import { randomizeSeed } from "../lib/randomize";
+import { QueueEngine } from "./queueEngine";
 import {
   initialState,
   queueReducer,
   type QueueAction,
   type QueueState,
 } from "./queueReducer";
-import { QueueEngine } from "./queueEngine";
-
-const LS_KEY = "era2_queue_v1";
-
-function persistTasks(tasks: GenerationTask[]) {
-  try {
-    // Running tasks are persisted as queued (they'll restart)
-    const toSave = tasks.map((t) =>
-      t.status === "running" ? { ...t, status: "queued" as const, progress: 0 } : t
-    );
-    localStorage.setItem(LS_KEY, JSON.stringify(toSave));
-  } catch {
-    // ignore
-  }
-}
-
-function loadTasks(): GenerationTask[] | null {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as GenerationTask[];
-  } catch {
-    return null;
-  }
-}
+import {
+  loadTasks,
+  persistTasks,
+  throttledPersistTasks,
+} from "../lib/manageLocaleStorageTasks";
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -49,7 +31,7 @@ export interface QueueContextValue {
   state: QueueState;
   dispatch: React.Dispatch<QueueAction>;
   cancelTask: (id: string) => void;
-  /** Snapshot for undo */
+  /** Снимок для отмены при удалении */
   undoSnapshot: GenerationTask[] | null;
   commitUndo: () => void;
   clearUndo: () => void;
@@ -59,21 +41,25 @@ export const QueueContext = createContext<QueueContextValue | null>(null);
 
 export function useQueueContext() {
   const ctx = useContext(QueueContext);
-  if (!ctx) throw new Error("useQueueContext must be used within QueueProvider");
+  if (!ctx)
+    throw new Error("useQueueContext must be used within QueueProvider");
   return ctx;
 }
 
-// ─── Provider ────────────────────────────────────────────────────────────────
+
 
 export function QueueProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(queueReducer, initialState);
   const stateRef = useRef(state);
   stateRef.current = state;
+  
 
   const engineRef = useRef<QueueEngine | null>(null);
 
-  // Undo support
-  const [undoSnapshot, setUndoSnapshot] = useState<GenerationTask[] | null>(null);
+  // Для отмены при удалении
+  const [undoSnapshot, setUndoSnapshot] = useState<GenerationTask[] | null>(
+    null,
+  );
 
   const cancelTask = useCallback((id: string) => {
     engineRef.current?.cancelTask(id);
@@ -86,9 +72,16 @@ export function QueueProvider({ children }: { children: ReactNode }) {
     }
   }, [undoSnapshot]);
 
-  const clearUndo = useCallback(() => setUndoSnapshot(null), []);
+  const clearUndo = useCallback(() => {
+    setUndoSnapshot((prev) => {
+      if (prev) {
+        persistTasks(prev.filter((t) => t.status !== "done"));
+      }
+      return null;
+    });
+  }, []);
 
-  // Expose snapshot setter via dispatch wrapper
+  // сохранить слепок данных при удалении для последующего восстановления
   const wrappedDispatch: React.Dispatch<QueueAction> = useCallback((action) => {
     if (action.type === "CLEAR_DONE" || action.type === "DELETE_TASKS") {
       setUndoSnapshot(stateRef.current.tasks);
@@ -96,10 +89,8 @@ export function QueueProvider({ children }: { children: ReactNode }) {
     dispatch(action);
   }, []);
 
-  // Initialise
   useEffect(() => {
     dispatch({ type: "INIT_START" });
-
     const timer = setTimeout(() => {
       // ~5% chance of init error (for demo)
       if (Math.random() < 0.05) {
@@ -107,14 +98,17 @@ export function QueueProvider({ children }: { children: ReactNode }) {
         return;
       }
       const saved = loadTasks();
-      const tasks = saved ?? SEED_TASKS;
+      const randomizedTasks = randomizeSeed(SEED_TASKS);
+      const tasks = saved ?? randomizedTasks;
       dispatch({ type: "INIT_SUCCESS", payload: tasks });
     }, 600);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
 
-  // Start/stop engine when ready
+  // Запуск/остановка движка
   useEffect(() => {
     if (state.loadingState !== "ready") return;
 
@@ -123,13 +117,16 @@ export function QueueProvider({ children }: { children: ReactNode }) {
     engine.start();
 
     return () => engine.stop();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.loadingState]);
 
   // Persist on every tasks change
   useEffect(() => {
+    /*
+      тротлинг при сохранении в localStorage, 
+      ибо сохранении на каждый тик - это слишком
+    */
     if (state.loadingState === "ready") {
-      persistTasks(state.tasks);
+      throttledPersistTasks(state.tasks);
     }
   }, [state.tasks, state.loadingState]);
 
@@ -142,8 +139,10 @@ export function QueueProvider({ children }: { children: ReactNode }) {
       commitUndo,
       clearUndo,
     }),
-    [state, wrappedDispatch, cancelTask, undoSnapshot, commitUndo, clearUndo]
+    [state, wrappedDispatch, cancelTask, undoSnapshot, commitUndo, clearUndo],
   );
 
-  return <QueueContext.Provider value={value}>{children}</QueueContext.Provider>;
+  return (
+    <QueueContext.Provider value={value}>{children}</QueueContext.Provider>
+  );
 }

@@ -36,7 +36,10 @@ export function useQueue() {
   );
 
   const retryTask = useCallback(
-    (id: string) => dispatch({ type: "RETRY_TASK", payload: { id } }),
+    (id: string) => {
+      dispatch({ type: "RETRY_TASK", payload: { id } });
+      dispatch({type: "SET_LOADING_STATE", payload: 'ready'})
+    },
     [dispatch]
   );
 

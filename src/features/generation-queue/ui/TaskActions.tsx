@@ -2,6 +2,7 @@ import type { GenerationTask } from "@/entities/generation-task";
 import { cn } from "@/shared/lib/utils";
 import { Download, MoreHorizontal, RotateCcw, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+
 interface TaskActionsProps {
   task: GenerationTask;
   onCancel: () => void;
@@ -27,7 +28,7 @@ function IconBtn({
       onClick={onClick}
       title={title}
       className={cn(
-        "w-8 h-8 rounded-xl flex items-center justify-center text-[var(--era-fg-mute)] hover:text-[var(--era-fg-dim)] hover:bg-[var(--era-bg-3)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--era-accent)]",
+        "flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         className,
       )}
     >
@@ -48,11 +49,13 @@ export function TaskActions({
 
   useEffect(() => {
     if (!menuOpen) return;
+
     function handle(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuOpen(false);
       }
     }
+
     document.addEventListener("mousedown", handle);
     return () => document.removeEventListener("mousedown", handle);
   }, [menuOpen]);
@@ -65,6 +68,7 @@ export function TaskActions({
         </IconBtn>
       );
     }
+
     if (task.status === "failed" || task.status === "cancelled") {
       return (
         <IconBtn onClick={onRetry} title="Повторить">
@@ -72,6 +76,7 @@ export function TaskActions({
         </IconBtn>
       );
     }
+
     if (task.status === "done") {
       return (
         <IconBtn onClick={onDownload ?? (() => {})} title="Скачать">
@@ -79,6 +84,7 @@ export function TaskActions({
         </IconBtn>
       );
     }
+
     return null;
   })();
 
@@ -92,13 +98,13 @@ export function TaskActions({
         </IconBtn>
 
         {menuOpen && (
-          <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-xl border border-[var(--era-line)] bg-[var(--era-bg-1)] shadow-lg py-1">
+          <div className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-xl border border-border bg-card py-1 shadow-lg">
             <button
               onClick={() => {
                 setMenuOpen(false);
                 onDelete();
               }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#ff5f57] hover:bg-[var(--era-bg-3)] transition-colors font-geist"
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-destructive transition-colors hover:bg-muted"
             >
               <Trash2 size={13} />
               Удалить

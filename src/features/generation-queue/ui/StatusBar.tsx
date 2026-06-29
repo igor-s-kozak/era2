@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { ProgressBar } from "./ProgressBar";
 import { TaskThumb } from "./TaskThumb";
+
 interface StatusBarProps {
   activeTasks: GenerationTask[];
   avgProgress: number;
@@ -15,56 +16,62 @@ export function StatusBar({
   avgProgress,
   onNavigateToQueue,
 }: StatusBarProps) {
-  const [expanded, setExpanded] = useState(true);
-
+  const [expanded, setExpanded] = useState(false);
   const count = activeTasks.length;
+
   const running = activeTasks.filter((t) => t.status === "running");
 
   if (count === 0) return null;
 
-  // ─── Collapsed pill ────────────────────────────────────────────────────────
   if (!expanded) {
     return (
-      <div className="fixed bottom-6 right-6 z-50 sm:bottom-0 sm:right-0 sm:left-0 sm:rounded-none sm:border-x-0 sm:border-b-0">
+      <div className="fixed bottom-6 right-6 z-50 max-md:bottom-4 max-md:right-0 max-md:left-0 max-md:w-full max-md:rounded-none max-md:border-x-0 max-md:border-b-0">
         <button
           onClick={() => setExpanded(true)}
-          className="flex items-center gap-2 h-9 px-4 rounded-full border border-[var(--era-line)] bg-[var(--era-bg-1)] text-[var(--era-fg-mute)] text-[13px] font-geist shadow-lg hover:bg-[var(--era-bg-2)] transition-colors"
+          className="flex h-9 items-center gap-2 rounded-full border border-border bg-card px-4 text-[13px] text-muted-foreground shadow-lg transition-colors hover:bg-muted"
         >
-          <span className="w-2 h-2 rounded-full bg-[var(--era-accent)] animate-pulse shrink-0" />
-          {count} {count === 1 ? "генерация" : "генерации"} · {avgProgress}%
-          <ChevronRight size={13} />
+          <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-primary" />
+          {count}{" "}
+          {count === 1 ? "генерация" : count > 4 ? "генераций" : "генерации"} ·{" "}
+          {avgProgress}%
+          <ChevronRight className="max-md:absolute max-md:right-6" size={13} />
         </button>
       </div>
     );
   }
 
-  // ─── Single task ──────────────────────────────────────────────────────────
+  // Один таск
   if (count === 1) {
     const task = activeTasks[0];
+
     return (
-      <div className="fixed bottom-6 right-6 z-50 sm:fixed sm:bottom-0 sm:right-0 sm:left-0 sm:rounded-none sm:rounded-t-2xl">
+      <div className="fixed bottom-6 right-6 z-50 max-md:bottom-4 max-md:right-0 max-md:left-0 max-md:rounded-none max-md:rounded-t-2xl">
         <div
           className={cn(
-            "w-[300px] sm:w-full rounded-2xl border border-[var(--era-line)] bg-[var(--era-bg-1)] shadow-xl overflow-hidden",
+            "w-full overflow-hidden rounded-2xl border border-border bg-card shadow-xl",
             "sm:rounded-b-none",
           )}
         >
           <div className="flex items-center gap-3 p-4">
             <TaskThumb type={task.type} size="sm" />
-            <div className="flex-1 min-w-0">
-              <p className="text-[var(--era-fg)] text-[13px] font-medium font-geist truncate">
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[13px] font-medium text-foreground">
                 Генерация {typeLabel(task.type)}
               </p>
-              <p className="text-[var(--era-fg-mute)] text-[12px] font-mono-geist">
+
+              <p className="font-mono text-[12px] text-muted-foreground">
                 {task.model} · {Math.round(task.progress)}%
               </p>
+
               {task.status === "running" && (
                 <ProgressBar progress={task.progress} className="mt-1.5" />
               )}
             </div>
+
             <button
               onClick={() => setExpanded(false)}
-              className="text-[var(--era-fg-low)] hover:text-[var(--era-fg-mute)] transition-colors"
+              className="text-muted-foreground transition-colors hover:text-foreground"
             >
               <ChevronDown size={14} />
             </button>
@@ -74,47 +81,51 @@ export function StatusBar({
     );
   }
 
-  // ─── Multiple tasks ───────────────────────────────────────────────────────
+  // Несколько тасков
   const previewTasks = activeTasks.slice(0, 3);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 sm:fixed sm:bottom-0 sm:right-0 sm:left-0 sm:rounded-none sm:rounded-t-2xl">
+    <div className="fixed bottom-6 right-6 z-50 max-md:bottom-4 max-md:right-0 max-md:left-0 max-md:rounded-none max-md:rounded-t-2xl">
       <div
         className={cn(
-          "w-[332px] sm:w-full rounded-2xl border border-[var(--era-line)] bg-[var(--era-bg-1)] shadow-xl overflow-hidden",
+          "w-full overflow-hidden rounded-2xl border border-border bg-card shadow-xl",
           "sm:rounded-b-none",
         )}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--era-line)]">
-          <span className="w-[18px] h-[18px] rounded-full bg-[var(--era-accent)] flex items-center justify-center shrink-0">
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+        <div className="flex items-center gap-3 border-b border-border px-4 py-3">
+          <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-primary">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
           </span>
-          <div className="flex-1 min-w-0">
-            <p className="text-[var(--era-fg)] text-[14px] font-medium font-geist leading-tight">
+
+          <div className="min-w-0 flex-1">
+            <p className="text-[14px] font-medium text-foreground">
               Генерации идут
             </p>
-            <p className="text-[var(--era-fg-mute)] text-[12px] font-mono-geist">
+            <p className="font-mono text-[12px] text-muted-foreground">
               {running.length} {pluralActive(running.length)} · {avgProgress}%
             </p>
           </div>
+
           <button
             onClick={() => setExpanded(false)}
-            className="text-[var(--era-fg-low)] hover:text-[var(--era-fg-mute)] transition-colors"
+            className="text-muted-foreground transition-colors hover:text-foreground"
           >
             <ChevronDown size={14} />
           </button>
         </div>
 
-        {/* Task list */}
-        <div className="px-3.5 py-2 flex flex-col gap-2">
+        {/* Список тасков */}
+        <div className="flex flex-col gap-2 px-3.5 py-2">
           {previewTasks.map((task) => (
             <div key={task.id} className="flex items-center gap-2.5">
               <TaskThumb type={task.type} size="sm" className="shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-[var(--era-fg-dim)] text-[12px] font-geist truncate">
+
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[12px] text-muted-foreground">
                   {task.prompt}
                 </p>
+
                 {task.status === "running" ? (
                   <ProgressBar
                     progress={task.progress}
@@ -122,12 +133,13 @@ export function StatusBar({
                     animated
                   />
                 ) : (
-                  <p className="text-[var(--era-fg-low)] text-[11px] font-geist mt-0.5">
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
                     в очереди
                   </p>
                 )}
               </div>
-              <span className="text-[var(--era-fg-low)] text-[11px] font-mono-geist tabular-nums shrink-0 w-7 text-right">
+
+              <span className="w-7 shrink-0 text-right font-mono text-[11px] tabular-nums text-muted-foreground">
                 {task.status === "running"
                   ? `${Math.round(task.progress)}%`
                   : ""}
@@ -139,7 +151,7 @@ export function StatusBar({
         {/* Footer */}
         <button
           onClick={onNavigateToQueue}
-          className="w-full flex items-center justify-center gap-1.5 py-3 border-t border-[var(--era-line)] text-[var(--era-fg-mute)] text-[13px] font-geist hover:text-[var(--era-fg-dim)] hover:bg-[var(--era-bg-2)] transition-colors"
+          className="flex w-full items-center justify-center gap-1.5 border-t border-border py-3 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           Открыть очередь
           <ChevronRight size={13} />

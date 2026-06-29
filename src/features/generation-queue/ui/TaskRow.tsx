@@ -5,6 +5,7 @@ import { ProgressBar } from "./ProgressBar";
 import { StatusBadge } from "./StatusBadge";
 import { TaskActions } from "./TaskActions";
 import { TaskThumb } from "./TaskThumb";
+
 interface TaskRowProps {
   task: GenerationTask;
   onCancel: () => void;
@@ -25,7 +26,7 @@ export function TaskRow({
   return (
     <div
       className={cn(
-        "flex items-center gap-4 px-4 py-3 rounded-2xl border border-[var(--era-line)] bg-[var(--era-bg-1)] hover:bg-[var(--era-bg-2)] transition-colors group min-h-[80px]",
+        "group flex min-h-[80px] items-center gap-4 rounded-2xl border border-border bg-card px-4 py-3 transition-colors hover:bg-muted",
         className,
       )}
     >
@@ -33,47 +34,48 @@ export function TaskRow({
       <TaskThumb type={task.type} className="shrink-0" />
 
       {/* Middle */}
-      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-        <p className="text-[var(--era-fg)] text-[15px] font-medium font-geist truncate leading-snug">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <p className="truncate text-[15px] font-medium leading-snug text-foreground">
           {task.prompt}
         </p>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--era-fg-low)] shrink-0" />
-            <span className="text-[var(--era-fg-mute)] text-[13px] font-mono-geist">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground" />
+            <span className="font-mono text-[13px] text-muted-foreground">
               {task.model}
             </span>
           </div>
-          <span className="text-[var(--era-fg-low)] text-[13px]">·</span>
-          <span className="text-[var(--era-fg-mute)] text-[13px] font-mono-geist">
+
+          <span className="text-[13px] text-muted-foreground">·</span>
+
+          <span className="font-mono text-[13px] text-muted-foreground">
             {meta}
           </span>
         </div>
 
         {task.status === "running" && (
-          <ProgressBar
-            progress={task.progress}
-            className="w-full max-w-[640px]"
-          />
+          <ProgressBar progress={task.progress} className="w-full" />
         )}
 
         {(task.status === "failed" || task.status === "cancelled") &&
           task.errorMessage && (
-            <p className="text-[#ff5f57] text-[12px] font-geist">
+            <p className="text-[12px] text-destructive">
               {task.errorMessage}
             </p>
           )}
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex shrink-0 items-center gap-3">
         {task.status === "running" && (
-          <span className="text-[var(--era-fg-dim)] text-[15px] font-mono-geist tabular-nums w-9 text-right">
+          <span className="w-9 text-right font-mono text-[15px] tabular-nums text-muted-foreground">
             {Math.round(task.progress)}%
           </span>
         )}
+
         <StatusBadge status={task.status} />
+
         <TaskActions
           task={task}
           onCancel={onCancel}
@@ -93,11 +95,14 @@ function buildMeta(task: GenerationTask): string {
         : "в очереди";
     return `${pos} · ${formatCredits(task.credits)}`;
   }
+
   if (task.status === "running" && task.etaSeconds != null) {
     return `${formatEta(task.etaSeconds)} · ${formatCredits(task.credits)}`;
   }
+
   if (task.status === "done" && task.startedAt && task.finishedAt) {
     return `${formatDuration(task.startedAt, task.finishedAt)} · ${formatCredits(task.credits)}`;
   }
+
   return formatCredits(task.credits);
 }
