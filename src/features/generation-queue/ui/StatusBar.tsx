@@ -25,10 +25,10 @@ export function StatusBar({
 
   if (!expanded) {
     return (
-      <div className="fixed bottom-6 right-6 z-50 max-md:bottom-4 max-md:right-0 max-md:left-0 max-md:w-full max-md:rounded-none max-md:border-x-0 max-md:border-b-0">
+      <div className="fixed bottom-6 right-6 z-50 max-md:bottom-8 max-md:right-0 max-md:left-0 max-md:w-full max-md:rounded-none max-md:border-x-0 max-md:border-b-0">
         <button
           onClick={() => setExpanded(true)}
-          className="flex h-9 items-center gap-2 rounded-full border border-border bg-card px-4 text-[13px] text-muted-foreground shadow-lg transition-colors hover:bg-muted"
+          className="flex h-9 items-center gap-2 max-md:w-full rounded-full border border-border bg-card px-4 text-[13px] text-muted-foreground shadow-lg transition-colors hover:bg-muted"
         >
           <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-primary" />
           {count}{" "}
